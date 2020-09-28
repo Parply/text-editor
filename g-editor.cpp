@@ -102,10 +102,21 @@ struct editorConfig E;
 char *C_HL_extensions[] = { ".c", ".h", ".cpp", NULL };
 char *C_HL_keywords[] = {
   "switch", "if", "while", "for", "break", "continue", "return", "else",
-  "struct", "union", "typedef", "static", "enum", "class", "case",
-  "int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|",
+  "struct", "union", "typedef", "static", "enum", "class", "case", "#define","using","#include",
+  "int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|", "const|",
   "void|", NULL
 };
+
+char *PY_HL_extensions[] = { ".py", NULL };
+char *PY_HL_keywords[] = {
+  "if", "while", "for", "break", "elif", "return", "else", "pass","def", "class", "and","as","assert","del",
+  "except","from","finally","try","except",
+  "import","in","is","lambda","not","or","raise","nonlocal",
+  "with","yield"
+  "int|", "long|", "double|", "float|", "True|","False|","None|", NULL
+};
+
+
 
 struct editorSyntax HLDB[] = {
   {
@@ -113,6 +124,13 @@ struct editorSyntax HLDB[] = {
     C_HL_extensions,
     C_HL_keywords,
     "//","/*","*/",
+    HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
+  },
+  {
+    "py",
+    PY_HL_extensions,
+    PY_HL_keywords,
+    "#","\"\"\"","\"\"\"",
     HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
   },
 };
@@ -801,8 +819,9 @@ void editorDrawStatusBar(struct abuf *ab) {
 int len = snprintf(status, sizeof(status), "%.20s - %d lines %s",
     E.filename ? E.filename : "[No Name]", E.numrows,
     E.dirty ? "(modified)" : "");
-    int rlen = snprintf(rstatus, sizeof(rstatus), "%s | %d/%d",
-    E.syntax ? E.syntax->filetype : "no ft", E.cy + 1, E.numrows);
+    
+    int rlen = snprintf(rstatus, sizeof(rstatus), "%s | %d%% %d/%d %d",
+    E.syntax ? E.syntax->filetype : "no ft", (100*(E.cy+1))/E.numrows,E.cy + 1, E.numrows,E.cx+1);
   if (len > E.screencols) len = E.screencols;
   abAppend(ab, status, len);
   while (len < E.screencols) {
